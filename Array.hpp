@@ -2,79 +2,56 @@
 #define ARRAY_HPP_
 
 #include <iostream>
-#include <stdarg.h>
 #include <cassert>
 
+template <typename elem_type, std::size_t size>
 class KernalArray {
     private:
-        size_t maxSize_;
-        double* array_;
+        std::size_t size_;
+        elem_type array_[size] = {};
     public:
-        KernalArray(const size_t maxSize, ...):
-            maxSize_(maxSize),
-            array_(new double[maxSize_])
-            {}
+        KernalArray(): size_(size) {}
+        ~KernalArray() {}
 
-        KernalArray(const KernalArray&) = default;
-        KernalArray& operator = (const KernalArray&) = default;
-        ~KernalArray() {
-            delete [] array_;
-        }
+        std::size_t get_size() const { return size_; }
 
-        size_t getMaxSize() const { return maxSize_; }
-
-        double& getArrayElem(const size_t i) const { return array_[i]; }
-        void setArrayElem(const size_t i, const double elem) { array_[i] = elem; }
+              elem_type& get_array_elem(const std::size_t i                      )       { return array_[i]; }
+        const elem_type& get_array_elem(const std::size_t i                      ) const { return array_[i]; }
+              void       set_array_elem(const std::size_t i, const elem_type elem)       { array_[i] = elem; }
 };
 
+template <typename elem_type, std::size_t size>
 class Array {
     private:
-        KernalArray kernalArray_;
+        KernalArray<elem_type, size> kernal_array_;
     public:
-        KernalArray getKernalArray() const { return kernalArray_; }
+        Array(): kernal_array_() {}
 
-        Array(const size_t maxSize, ...):
-            kernalArray_(maxSize)
-            {
-                va_list vl;
-                va_start(vl, maxSize);
-                for (size_t i = 0; i < maxSize; i++) {
-                    kernalArray_.setArrayElem(i, va_arg(vl, double));
-                }
-                va_end(vl);
-            }
-
-        Array(const Array& array):
-            kernalArray_(array.getKernalArray())
-            {}
-        Array& operator = (const Array& array) {
-            kernalArray_ = array.getKernalArray();
-
-            return *this;
-        }
+               Array      (const Array& array) = default;
+        Array& operator = (const Array& array) = default;
         ~Array() {}
 
-        double& operator [] (const size_t i) {
-            if (i < kernalArray_.getMaxSize()) {
-                return kernalArray_.getArrayElem(i);
+        double& operator [] (const std::size_t i) {
+            if (i < kernal_array_.get_size()) {
+                return kernal_array_.get_array_elem(i);
             } else {
                 std::cout << "Invalid index\n";
                 assert(0);
             }
         }
 
-        const double& operator [] (const size_t i) const {
-            if (i < kernalArray_.getMaxSize()) {
-                return kernalArray_.getArrayElem(i);
+        const double& operator [] (const std::size_t i) const {
+            if (i < kernal_array_.get_size()) {
+                return kernal_array_.get_array_elem(i);
             } else {
                 std::cout << "Invalid index\n";
                 assert(0);
             }
         }
 
-        void printArray() const {
-            for (size_t i = 0; i < kernalArray_.getMaxSize(); i++) {
-                std::cout << kernalArray_.getArrayElem(i) << "\n";
+        void print_array() const {
+            for (std::size_t i = 0; i < kernal_array_.get_size(); i++) {
+                std::cout << kernal_array_.get_array_elem(i) << "\n";
             }
         }
 };
